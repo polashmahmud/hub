@@ -189,12 +189,112 @@
         font-family: var(--mono-font);
         font-size: 13px;
       }
+
+      /* Copy Raw Button */
+      .copy-raw-btn {
+        position: fixed;
+        top: 20px;
+        right: 30px;
+        z-index: 1000;
+        background-color: #0969da;
+        color: #ffffff;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-family: var(--mono-font);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        transition: background-color 0.2s;
+      }
+      .copy-raw-btn:hover {
+        background-color: #0353a4;
+      }
+      .copy-raw-btn.copied {
+        background-color: #2da44e;
+      }
     </style>
   </head>
   <body>
     <div id="app">Loading My Digital Brain...</div>
 
     <script>
+      // Plugin to add Copy Raw Markdown button
+      function copyRawPlugin(hook, vm) {
+        var currentMarkdown = "";
+
+        hook.beforeEach(function (content) {
+          currentMarkdown = content;
+          return content;
+        });
+
+        hook.doneEach(function () {
+          var btn = document.querySelector(".copy-raw-btn");
+
+          if (!btn) {
+            btn = document.createElement("button");
+            btn.className = "copy-raw-btn";
+            btn.innerText = "Copy Raw Markdown";
+            document.body.appendChild(btn);
+          }
+
+          btn.onclick = function () {
+            if (!currentMarkdown) return;
+
+            // Robust copy function handling HTTP/HTTPS and older browsers
+            function copyToClipboard(text) {
+              if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(success, fallback);
+              } else {
+                fallback();
+              }
+
+              function fallback() {
+                try {
+                  var textArea = document.createElement("textarea");
+                  textArea.value = text;
+                  textArea.style.position = "fixed";
+                  textArea.style.top = "0";
+                  textArea.style.left = "0";
+                  textArea.style.width = "2em";
+                  textArea.style.height = "2em";
+                  textArea.style.padding = "0";
+                  textArea.style.border = "none";
+                  textArea.style.outline = "none";
+                  textArea.style.boxShadow = "none";
+                  textArea.style.background = "transparent";
+                  document.body.appendChild(textArea);
+                  textArea.focus();
+                  textArea.select();
+                  var successful = document.execCommand("copy");
+                  document.body.removeChild(textArea);
+                  if (successful) success();
+                  else fail();
+                } catch (err) {
+                  fail();
+                }
+              }
+
+              function success() {
+                btn.innerText = "Copied!";
+                btn.classList.add("copied");
+                setTimeout(function () {
+                  btn.innerText = "Copy Raw Markdown";
+                  btn.classList.remove("copied");
+                }, 2000);
+              }
+
+              function fail() {
+                alert("Could not copy text. Please copy manually.");
+              }
+            }
+
+            copyToClipboard(currentMarkdown);
+          };
+        });
+      }
+
       window.$docsify = {
         name: "AI Prompt Hub",
         homepage: "README.md",
@@ -204,6 +304,8 @@
         subMaxLevel: 3,
         auto2top: true,
         relativePath: true,
+
+        plugins: [copyRawPlugin],
 
         search: {
           maxAge: 86400000,
