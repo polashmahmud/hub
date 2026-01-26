@@ -35,41 +35,39 @@
         background-color: #ffffff;
       }
 
-      /* Sidebar */
+      /* Sidebar - Hidden */
       .sidebar {
-        background-color: #f6f8fa;
-        border-right: 1px solid #d0d7de;
-        width: var(--sidebar-width);
+        display: none !important;
       }
 
-      .sidebar .app-name {
+      /* Reset layout since sidebar is gone */
+      body,
+      .content {
+        padding-left: 0 !important;
+      }
+
+      .app-nav {
         display: none;
       }
 
-      .sidebar-nav ul {
-        padding: 0;
-        margin: 20px 0;
-      }
-
-      .sidebar-nav li {
-        list-style: none;
-      }
-
-      .sidebar-nav a {
-        display: block;
-        padding: 4px 20px;
-        color: #24292f;
-        text-decoration: none;
+      /* Back to Home Button */
+      .back-home-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        padding: 6px 12px;
+        font-family: var(--mono-font);
         font-size: 13px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        color: #24292f;
+        background-color: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
       }
-
-      .sidebar-nav a:hover,
-      .sidebar-nav a.active {
+      .back-home-link:hover {
+        background-color: #f3f4f6;
         color: #0969da;
-        background: #f3f4f6;
+        text-decoration: none;
       }
 
       /* Content Area - Raw Markdown Look */
@@ -220,6 +218,21 @@
     <div id="app">Loading My Digital Brain...</div>
 
     <script>
+      // Plugin to add Back to Home button
+      function backToHomePlugin(hook, vm) {
+        hook.beforeEach(function (content) {
+          var hash = window.location.hash;
+          // Simple check: if not root (README), show back button
+          if (hash !== "#/" && hash !== "#/README") {
+            return (
+              '<a href="#/" class="back-home-link">← Back to Home</a>\n\n' +
+              content
+            );
+          }
+          return content;
+        });
+      }
+
       // Plugin to add Copy Raw Markdown button
       function copyRawPlugin(hook, vm) {
         var currentMarkdown = "";
@@ -299,13 +312,13 @@
         name: "AI Prompt Hub",
         homepage: "README.md",
         repo: "",
-        loadSidebar: true,
+        loadSidebar: false,
         maxLevel: 3,
         subMaxLevel: 3,
         auto2top: true,
         relativePath: true,
 
-        plugins: [copyRawPlugin],
+        plugins: [backToHomePlugin, copyRawPlugin],
 
         search: {
           maxAge: 86400000,
