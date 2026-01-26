@@ -4,4 +4,4 @@ Reusable prompts for Laravel, Vue, and automation work.
 
 ## Prompts
 
-- [Vue Sonner Toast](toast.md)
+- [Vue Sonner to Laravel Inertia (Toast Notification)](toast.md)
