@@ -329,7 +329,3 @@ initializeTheme();
 - Files contain the snippets above verbatim
 - TypeScript remains strict and Vue 3 script-setup friendly
 - Flash messages render as toasts with the configured position, theme, and duration
-
-```
-
-```
